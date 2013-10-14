@@ -1,0 +1,41 @@
+body {
+    font-family: "Open Sans", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+    margin: 0px;
+    padding: 0px;
+    color: #555555;
+    min-width: 320px;
+}
+.segment {
+padding-top: 70px;
+}
+.container {
+    width: auto;
+    margin-left: 175px;
+    margin-right: 100px;
+}
+.column p {
+    margin-left: 20px;
+    text-align: justify;
+}
+
+.column ul {
+    list-style-type: none;
+}
+.column ul > li {
+    border-bottom: 1px dotted #BBB;
+}
+.column ul > li:hover {
+    border-bottom: 1px solid #999;
+}
+.column ul > li a {
+    margin-left: -40px;
+    text-decoration: none;
+}
+.column ul > li a:hover {
+    font-weight: bold;
+}
+#pgp pre {
+    font-size: 60%;
+    margin-top: -12px;
+    text-align: right;
+}
