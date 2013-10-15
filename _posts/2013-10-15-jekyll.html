@@ -2,8 +2,6 @@
 layout: default
 title: Jekyll static site generation and auto deployment
 ---
-<h1 class="title">Running a static website with Jekyll</h1>
-
 <p>We use more and more dynamic page creation systems, complex Python or PHP frameworks. However, I think that static sites are often an underestimated to create simple websites. <a href="http://jekyllrb.org/">Jekyll</a> is a static website generator, I could say "a dynamic way to generate static sites". Jekyll is coded in Ruby, and very simple to install using Gems. It is also available in Debian repositories. 
 </p>
 <p>
@@ -54,7 +52,7 @@ title: Jekyll static site generation and auto deployment
 
 
 
-    <pre class="src src-text">
+    <pre class="example">
       ~ # gem install jekyll
     </pre>
 
@@ -65,7 +63,7 @@ title: Jekyll static site generation and auto deployment
 
 
 
-    <pre class="src src-text">
+    <pre class="example">
       ~ # apt-get install jekyll
     </pre>
 
@@ -85,7 +83,7 @@ title: Jekyll static site generation and auto deployment
 
 
 
-    <pre class="src src-text">
+    <pre class="example">
       ~ $ mkdir staticsite
       ~ $ cd staticsite
     </pre>
@@ -143,11 +141,11 @@ title: Jekyll static site generation and auto deployment
       </p>
 
 
-      <pre class="src src-text">
-	&#45;&#45;&#45;
+      <pre class="example">
+	---
 	layout: ...
 	title: ...
-	&#45;&#45;&#45;
+	---
       </pre>
 
 
@@ -160,16 +158,16 @@ title: Jekyll static site generation and auto deployment
 
 
 
-      <pre class="src src-text">
-	&#45;&#45;&#45;
+      <pre class="example">
+	---
 	layout: default
 	title: pstch.net
-	&#45;&#45;&#45;
+	---
       </pre>
 
 
       <p>
-	Then, the layout that would be used would be the "default.html" file in the "_layouts" directory. When writing a layout, you can use <a href="http://docs.shopify.com/themes/liquid-basics/2-operators">Liquid</a> template tags to ease your work, and you have at lease the following context available to you :
+	Then, the layout that would be used would be the "default.html" file in the "layouts" directory. When writing a layout, you can use <a href="http://docs.shopify.com/themes/liquid-basics/2-operators">Liquid</a> template tags to ease your work, and you have at lease the following context available to you :
       </p><dl>
 	<dt>&#123;&#123; page.title &#125;&#125;</dt><dd>Value of the "title:" attribute in the file header
 	</dd>
@@ -211,25 +209,24 @@ title: Jekyll static site generation and auto deployment
 
 
 
-
-	    <pre class="src src-text">
-	      &#125;&#37; include header.html &#37;&#125;
-	      &lt;div class="segment"&gt;
-	      &lt;div class="container"&gt;
-	      &lt;div class="introduction"&gt;
-	      &lt;h1 class="ui dividing header"&gt;
-              &#123;&#123; page.title &#125;&#125;
-	      &lt;/h1&gt;
-	      &lt;p&gt;
+	    <pre class="src src-html">
+	      &#123;&#37; include header.html &#37;&#125;
+	      &lt;<span style="color: #edd400; font-weight: bold;">div</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"segment"</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">div</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"container"</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">div</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"introduction"</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">h1</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"ui dividing header"</span>&gt;
+	      <span style="font-weight: bold; text-decoration: underline;">&#123;&#123; page.title &#125;&#125;</span>
+	      <span style="font-weight: bold; text-decoration: underline;"></span>&lt;/<span style="color: #edd400; font-weight: bold;">h1</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">p</span>&gt;
               &#123;&#123; page.summary &#125;&#125;
-	      &lt;/p&gt;
-	      &lt;/div&gt;
-	      &lt;/div&gt;
-	      &lt;/div&gt;
-	      &lt;div class="main container"&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">p</span>&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">div</span>&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">div</span>&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">div</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">div</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"main container"</span>&gt;
 	      &#123;&#123; content &#125;&#125;
-	      &lt;/div&gt;
-	      &#125;&#37; include footer.html &#37;&#125;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">div</span>&gt;
+	      &#123;&#37; include footer.html &#37;&#125;
 	    </pre>
 
 
@@ -244,23 +241,23 @@ title: Jekyll static site generation and auto deployment
 
 
 
-	    <pre class="src src-text">
-	      &lt;!DOCTYPE html&gt;
-	      &lt;html&gt;
-	      &lt;head&gt;
-              &lt;meta charset="utf-8" /&gt;
-              &lt;link rel="stylesheet" type="text/css" href="/media/css/semantic.css"&gt;
-              &lt;link rel="stylesheet" type="text/css" href="/media/css/custom.css"&gt;
-              &lt;title&gt;&#123;&#123; page.title &#125;&#125;&lt;/title&gt;
-	      &lt;/head&gt;
-	      &lt;body&gt;
-	      &lt;div class="ui fixed inverted main menu"&gt;
-              &lt;div class="container"&gt;
-              &lt;a class="active item"&gt;
-              &lt;i class="home icon"&gt;&lt;/i&gt; &lt;strong&gt;pstch.net&lt;/strong&gt;
-              &lt;/a&gt;
-              &lt;/div&gt;
-	      &lt;/div&gt;
+	    <pre class="src src-html">
+	      &lt;<span style="color: #729fcf; font-weight: bold;">!DOCTYPE</span> html&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">html</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">head</span>&gt;
+              &lt;<span style="color: #edd400; font-weight: bold;">meta</span> <span style="color: #cd0000;">charset</span>=<span style="color: #ad7fa8; font-style: italic;">"utf-8"</span> /&gt;
+              &lt;<span style="color: #edd400; font-weight: bold;">link</span> <span style="color: #cd0000;">rel</span>=<span style="color: #ad7fa8; font-style: italic;">"stylesheet"</span> <span style="color: #cd0000;">type</span>=<span style="color: #ad7fa8; font-style: italic;">"text/css"</span> <span style="color: #cd0000;">href</span>=<span style="color: #ad7fa8; font-style: italic;">"/media/css/semantic.css"</span>&gt;
+              &lt;<span style="color: #edd400; font-weight: bold;">link</span> <span style="color: #cd0000;">rel</span>=<span style="color: #ad7fa8; font-style: italic;">"stylesheet"</span> <span style="color: #cd0000;">type</span>=<span style="color: #ad7fa8; font-style: italic;">"text/css"</span> <span style="color: #cd0000;">href</span>=<span style="color: #ad7fa8; font-style: italic;">"/media/css/custom.css"</span>&gt;
+              &lt;<span style="color: #edd400; font-weight: bold;">title</span>&gt;<span style="font-weight: bold; text-decoration: underline;">&#123;&#123; page.title &#125;&#125;</span>&lt;/<span style="color: #edd400; font-weight: bold;">title</span>&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">head</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">body</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">div</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"ui fixed inverted main menu"</span>&gt;
+              &lt;<span style="color: #edd400; font-weight: bold;">div</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"container"</span>&gt;
+              &lt;<span style="color: #edd400; font-weight: bold;">a</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"active item"</span>&gt;
+              &lt;<span style="color: #edd400; font-weight: bold;">i</span> <span style="color: #cd0000;">class</span>=<span style="color: #ad7fa8; font-style: italic;">"home icon"</span>&gt;&lt;/<span style="color: #edd400; font-weight: bold;">i</span>&gt; &lt;<span style="color: #edd400; font-weight: bold;">strong</span>&gt;<span style="font-weight: bold;">pstch.net</span>&lt;/<span style="color: #edd400; font-weight: bold;">strong</span>&gt;
+              &lt;/<span style="color: #edd400; font-weight: bold;">a</span>&gt;
+              &lt;/<span style="color: #edd400; font-weight: bold;">div</span>&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">div</span>&gt;
 	    </pre>
 
 
@@ -272,15 +269,15 @@ title: Jekyll static site generation and auto deployment
 
 
 
-	    <pre class="src src-text">
-	      &lt;script src="/media/js/jquery.js"&gt;
+	    <pre class="src src-html">
+	      &lt;<span style="color: #edd400; font-weight: bold;">script</span> <span style="color: #cd0000;">src</span>=<span style="color: #ad7fa8; font-style: italic;">"/media/js/jquery.js"</span>&gt;
 
-	      &lt;/script&gt;
-	      &lt;script src="/media/js/semantic.js"&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">script</span>&gt;
+	      &lt;<span style="color: #edd400; font-weight: bold;">script</span> <span style="color: #cd0000;">src</span>=<span style="color: #ad7fa8; font-style: italic;">"/media/js/semantic.js"</span>&gt;
 
-	      &lt;/script&gt;
-	      &lt;/body&gt;
-	      &lt;/html&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">script</span>&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">body</span>&gt;
+	      &lt;/<span style="color: #edd400; font-weight: bold;">html</span>&gt;
 	    </pre>
 
 
@@ -305,7 +302,7 @@ title: Jekyll static site generation and auto deployment
 
 
 
-      <pre class="src src-text">
+      <pre class="example">
 	---
 	layout: default
 	title: FOO
@@ -332,7 +329,7 @@ title: Jekyll static site generation and auto deployment
 
 
 
-      <pre class="src src-text">
+      <pre class="example">
 	$ jekyll --server
       </pre>
 
@@ -347,9 +344,17 @@ title: Jekyll static site generation and auto deployment
 
 <div id="outline-container-3" class="outline-2">
   <h2 id="sec-3"><span class="section-number-2">3</span> Deploy to a server</h2>
+  <div class="outline-text-2" id="text-3">
+
+
+
+  </div>
+
   <div id="outline-container-3-1" class="outline-3">
     <h3 id="sec-3-1"><span class="section-number-3">3.1</span> Git repositories</h3>
     <div class="outline-text-3" id="text-3-1">
+
+
       <p> 
 	In order to deploy this website to a server, we will use a code versionning tool : Git.
       </p>
@@ -359,7 +364,7 @@ title: Jekyll static site generation and auto deployment
 
 
 
-      <pre class="src src-text">
+      <pre class="example">
 	# Inside of staticsite/
 
 	$ git init
@@ -377,10 +382,10 @@ title: Jekyll static site generation and auto deployment
 
 
 
-      <pre class="src src-text">
+      <pre class="example">
 	# On the server
-	$ git init --bare staticsite
-	Initialized empty git repository in staticsite/
+	$ git init --bare staticsite.git
+	Initialized empty git repository in staticsite.git/
       </pre>
 
 
@@ -390,8 +395,8 @@ title: Jekyll static site generation and auto deployment
 
 
 
-      <pre class="src src-text">
-	$ git remote add origin user@server:path/to/staticsite
+      <pre class="example">
+	$ git remote add origin user@server:path/to/staticsite.git
 	$ git push origin master
       </pre>
 
@@ -405,14 +410,14 @@ title: Jekyll static site generation and auto deployment
 
 
 
-      <pre class="src src-text">
+      <pre class="example">
 	# On the server
 	$ git clone staticsite
       </pre>
 
 
       <p>
-	You should then make Jekyll generate the website inside of this directory (staticsite). Just 'cd' into it and run the command 'jekyll', and the site will be generated to '_site'.
+	This will clone the repository stored in staticsite.git to the staticsite/ directory. You should then make Jekyll generate the website inside of this directory (staticsite). Just 'cd' into it and run the command 'jekyll', and the site will be generated to '_site'.
       </p>
 
     </div>
@@ -450,7 +455,7 @@ title: Jekyll static site generation and auto deployment
 
 
 
-      <pre class="src src-text">
+      <pre class="example">
 	git --git-dir=/home/pistache/staticsite/.git/ pull origin master
 	jekyll /home/pistache/staticsite/ /home/pistache/staticsite/_site/
       </pre>
@@ -465,9 +470,7 @@ title: Jekyll static site generation and auto deployment
   </div>
 </div>
 
-<div id="postamble">
-  <p class="date">Date: 2013-10-15T02:56+0200</p>
-  <p class="author">Author: Hugo Geoffroy</p>
-  <p class="creator"><a href="http://orgmode.org">Org</a> version 7.9.3f with <a href="http://www.gnu.org/software/emacs/">Emacs</a> version 24</p>
-</div>
-
+<p class="date">Date: 2013-10-15T18:23+0200</p>
+<p class="author">Author: Hugo Geoffroy</p>
+<p class="creator"><a href="http://orgmode.org">Org</a> version 7.9.3f with <a href="http://www.gnu.org/software/emacs/">Emacs</a> version 24</p>
+<a href="http://validator.w3.org/check?uri=referer">Validate XHTML 1.0</a>

@@ -41,3 +41,7 @@ padding-top: 70px;
     margin-top: -12px;
     text-align: right;
 }
+dl > dt {
+    border-bottom: 1px dotted #DDD;
+    font-weight: bold;
+}
