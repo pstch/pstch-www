@@ -23,7 +23,7 @@ title: pstch.net
     <div class="column">
       <h2>Network overview</h2>
       <p>
-	<ul>
+	<ul id="network">
 	  <li>
 	    <a href="http://munin.pstch.net"><i class="circular wrench icon"></i> <strong>munin</strong>.pstch.net</a>
 	  </li>
@@ -33,6 +33,14 @@ title: pstch.net
       <p><a href="/4F838BAB.asc">Hugo Geoffroy (pistache) &lt;hugo@pstch.net&gt;</a></p>
 
       <p><i class="icon help"></i>Click <a href="http://sks.pkqs.net/pks/lookup?search=0x4F838BAB">here</a> to view full key on the public keyservers.</p>
-     </div>
+      <h2>Posts</h2>
+      <ul>
+	{% for post in site.posts %}
+	<li>
+	  <a href="{{ post.url }}">{{ post.title }}</a>
+	</li>
+	{% endfor %}
+      </ul>
+    </div>
    </div>
 </div>

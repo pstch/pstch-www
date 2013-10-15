@@ -18,18 +18,20 @@ padding-top: 70px;
     text-align: justify;
 }
 
-.column ul {
+.column ul#network {
     list-style-type: none;
 }
-.column ul > li {
+.column ul#network > li {
     border-bottom: 1px dotted #BBB;
+}
+.column ul > li a {
+    text-decoration: none;
 }
 .column ul > li:hover {
     border-bottom: 1px solid #999;
 }
-.column ul > li a {
+.column ul#network > li a {
     margin-left: -40px;
-    text-decoration: none;
 }
 .column ul > li a:hover {
     font-weight: bold;

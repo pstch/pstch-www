@@ -1,0 +1,473 @@
+---
+layout: default
+title: Jekyll static site generation and auto deployment
+---
+<h1 class="title">Running a static website with Jekyll</h1>
+
+<p>We use more and more dynamic page creation systems, complex Python or PHP frameworks. However, I think that static sites are often an underestimated to create simple websites. <a href="http://jekyllrb.org/">Jekyll</a> is a static website generator, I could say "a dynamic way to generate static sites". Jekyll is coded in Ruby, and very simple to install using Gems. It is also available in Debian repositories. 
+</p>
+<p>
+  Jekyll parses files in Markdown or Textile format, and interprets the Liquid template language. Jekyll is also a blogging system, it has got blog-specific features (post/draft publishing).
+</p>
+<p>
+  In this post I will describe how to set up a Jekyll website online, how to create the directory structure, and how to automate the website's build operation.
+</p>
+
+<div id="table-of-contents">
+  <h2>Table of Contents</h2>
+  <div id="text-table-of-contents">
+    <ul>
+      <li><a href="#sec-1">1 Installing Jekyll</a></li>
+      <li><a href="#sec-2">2 Creating your first Jekyll site</a>
+	<ul>
+	  <li><a href="#sec-2-1">2.1 Setting up some layout files</a>
+	    <ul>
+	      <li><a href="#sec-2-1-1">2.1.1 Example config (pstch.net)</a></li>
+	    </ul>
+	  </li>
+	  <li><a href="#sec-2-2">2.2 Creating home page</a></li>
+	  <li><a href="#sec-2-3">2.3 Testing your config</a></li>
+	</ul>
+      </li>
+      <li><a href="#sec-3">3 Deploy to a server</a>
+	<ul>
+	  <li><a href="#sec-3-1">3.1 Git repositories</a>
+	    <ul>
+	      <li><a href="#sec-3-1-1">3.1.1 Ignore the "_site" directory</a></li>
+	    </ul>
+	  </li>
+	  <li><a href="#sec-3-2">3.2 Git hooks</a></li>
+	</ul>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div id="outline-container-1" class="outline-2">
+  <h2 id="sec-1"><span class="section-number-2">1</span> Installing Jekyll</h2>
+  <div class="outline-text-2" id="text-1">
+
+
+    <p>
+      Jekyll is best installed using Ruby gems :
+    </p>
+
+
+
+    <pre class="src src-text">
+      ~ # gem install jekyll
+    </pre>
+
+
+    <p>
+      If you use Debian, you can use apt-get :
+    </p>
+
+
+
+    <pre class="src src-text">
+      ~ # apt-get install jekyll
+    </pre>
+
+
+  </div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+  <h2 id="sec-2"><span class="section-number-2">2</span> Creating your first Jekyll site</h2>
+  <div class="outline-text-2" id="text-2">
+
+
+    <p>
+      Let's create a working environment.
+    </p>
+
+
+
+    <pre class="src src-text">
+      ~ $ mkdir staticsite
+      ~ $ cd staticsite
+    </pre>
+
+
+    <p>
+      First, we have to create the directory structure, which is described <a href="http://jekyllrb.com/docs/structure/">here</a>. Jekyll uses the following special directories and files:
+    </p><dl>
+      <dt>_includes/</dt><dd>Included files
+      </dd>
+      <dt>_layouts/</dt><dd>HTML layout
+      </dd>
+      <dt>_posts/</dt><dd>Blog posts
+      </dd>
+      <dt>_drafts/</dt><dd>Used for storing drafts posts
+      </dd>
+      <dt>_site/</dt><dd>Generated sites
+      </dd>
+      <dt>media/</dt><dd>Media files (CSS, JS, images)
+      </dd>
+      <dt>index.html</dt><dd>Site homepage
+      </dd>
+    </dl>
+
+
+    <p>
+      It is not compulsory to use the blog posts and drafts system, and if you don't want to use them, you can delete the _drafts and _posts directories. The files and folders that you have to create are at least :
+    </p><ul>
+      <li>_layouts
+      </li>
+      <li>index.html
+      </li>
+    </ul>
+
+
+    <p>
+      Any file or folder that is present in the work directory will be present in the generated static site, except those starting with an underscore. Which means that here, the index.html file and media directory will be present in the generated site.
+    </p>
+    <p>
+      Jekyll generates the website in the "_site" directory.
+    </p>
+
+  </div>
+
+  <div id="outline-container-2-1" class="outline-3">
+    <h3 id="sec-2-1"><span class="section-number-3">2.1</span> Setting up some layout files</h3>
+    <div class="outline-text-3" id="text-2-1">
+
+
+      <p>
+	To use Jekyll, you need to define "layouts". These layout define how the data will be present in the rendered HTML file. A layout can be compared to a template.
+      </p>
+      <p>
+	When we will create new pages, they will need, at least, to have the following header :
+      </p>
+
+
+      <pre class="src src-text">
+	&#45;&#45;&#45;
+	layout: ...
+	title: ...
+	&#45;&#45;&#45;
+      </pre>
+
+
+      <p>
+	This header is used to set the name of the layout that will be used to render the page, and 'title' is&hellip; yes, the title of the page. You can set your own attributes too, and then use them somewhere in the layout.
+      </p>
+      <p>
+	If the preceding header had these values :
+      </p>
+
+
+
+      <pre class="src src-text">
+	&#45;&#45;&#45;
+	layout: default
+	title: pstch.net
+	&#45;&#45;&#45;
+      </pre>
+
+
+      <p>
+	Then, the layout that would be used would be the "default.html" file in the "_layouts" directory. When writing a layout, you can use <a href="http://docs.shopify.com/themes/liquid-basics/2-operators">Liquid</a> template tags to ease your work, and you have at lease the following context available to you :
+      </p><dl>
+	<dt>&#123;&#123; page.title &#125;&#125;</dt><dd>Value of the "title:" attribute in the file header
+	</dd>
+	<dt>&#123;&#123; page.* &#125;&#125;</dt><dd>Value of any other named attribute
+	</dd>
+	<dt>&#123;&#123; content &#125;&#125;</dt><dd>Everything present after the header, parsed according to file type.
+	</dd>
+      </dl>
+
+
+
+    </div>
+
+    <div id="outline-container-2-1-1" class="outline-4">
+      <h4 id="sec-2-1-1"><span class="section-number-4">2.1.1</span> Example config (pstch.net)</h4>
+      <div class="outline-text-4" id="text-2-1-1">
+
+
+	<p>
+	  For example, here is my own layout. It's an example layout file that uses <a href="http://jquery.com/">jQuery</a> and the <a href="http://semantic-ui.com/">Semantic-UI</a> CSS framework. I just hadd to reference the following files :
+	</p><dl>
+	  <dt>semantic.css</dt><dd>Semantic-UI CSS
+	  </dd>
+	  <dt>semantic.js</dt><dd>Semantic-UI JS
+	  </dd>
+	  <dt>jquery.js</dt><dd>jQuery JS
+	  </dd>
+	</dl>
+
+
+	<p>
+	  For this to work, these files need to be present in the specified directories, as well as Semantic-UI pictures and fonts (use the packaged Semantic-UI build).
+	</p>
+	<p>
+	  The generated website only have one page, but I think that seeing this source code will help you to clarify how Jekyll works. If you're familiar with software like Django, this is the same however there are no "views", just static files containing template code.
+	</p>
+	<ul>
+	  <li id="sec-2-1-1-1">layouts / default.html<br/>
+
+
+
+
+	    <pre class="src src-text">
+	      {% include header.html %}
+	      &lt;div class="segment"&gt;
+	      &lt;div class="container"&gt;
+	      &lt;div class="introduction"&gt;
+	      &lt;h1 class="ui dividing header"&gt;
+              &#123;&#123; page.title &#125;&#125;
+	      &lt;/h1&gt;
+	      &lt;p&gt;
+              &#123;&#123; page.summary &#125;&#125;
+	      &lt;/p&gt;
+	      &lt;/div&gt;
+	      &lt;/div&gt;
+	      &lt;/div&gt;
+	      &lt;div class="main container"&gt;
+	      &#123;&#123; content &#125;&#125;
+	      &lt;/div&gt;
+	      {% include footer.html %}
+	    </pre>
+
+
+	    <p>
+	      As you can see, I used include for the "header.html" and "footer.html" files, that are present into the "_include" directory.
+	    </p>
+	  </li>
+	</ul>
+	<ul>
+	  <li id="sec-2-1-1-2">includes / header.html<br/>
+
+
+
+
+	    <pre class="src src-text">
+	      &lt;!DOCTYPE html&gt;
+	      &lt;html&gt;
+	      &lt;head&gt;
+              &lt;meta charset="utf-8" /&gt;
+              &lt;link rel="stylesheet" type="text/css" href="/media/css/semantic.css"&gt;
+              &lt;link rel="stylesheet" type="text/css" href="/media/css/custom.css"&gt;
+              &lt;title&gt;&#123;&#123; page.title &#125;&#125;&lt;/title&gt;
+	      &lt;/head&gt;
+	      &lt;body&gt;
+	      &lt;div class="ui fixed inverted main menu"&gt;
+              &lt;div class="container"&gt;
+              &lt;a class="active item"&gt;
+              &lt;i class="home icon"&gt;&lt;/i&gt; &lt;strong&gt;pstch.net&lt;/strong&gt;
+              &lt;/a&gt;
+              &lt;/div&gt;
+	      &lt;/div&gt;
+	    </pre>
+
+
+	  </li>
+	</ul>
+	<ul>
+	  <li id="sec-2-1-1-3">includes / footer.html<br/>
+
+
+
+
+	    <pre class="src src-text">
+	      &lt;script src="/media/js/jquery.js"&gt;
+
+	      &lt;/script&gt;
+	      &lt;script src="/media/js/semantic.js"&gt;
+
+	      &lt;/script&gt;
+	      &lt;/body&gt;
+	      &lt;/html&gt;
+	    </pre>
+
+
+	  </li>
+	</ul>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="outline-container-2-2" class="outline-3">
+    <h3 id="sec-2-2"><span class="section-number-3">2.2</span> Creating home page</h3>
+    <div class="outline-text-3" id="text-2-2">
+
+
+      <p>
+	Once you have created your layout (say, "default.html"), creating new pages is very simple : you just modify an HTML file. Let's start with the homepage, open the file : "index.html".
+      </p>
+      <p>
+	For this file to be processed by Jekyll, it needs the <a href="#sec-2-1">header</a> to be present :
+      </p>
+
+
+
+      <pre class="src src-text">
+	---
+	layout: default
+	title: FOO
+	---
+	CONTENT
+      </pre>
+
+
+      <p>
+	Where DOO is the title of the page and CONTENT, the HTML content that will be shown.
+      </p>
+    </div>
+
+  </div>
+
+  <div id="outline-container-2-3" class="outline-3">
+    <h3 id="sec-2-3"><span class="section-number-3">2.3</span> Testing your config</h3>
+    <div class="outline-text-3" id="text-2-3">
+
+
+      <p>
+	Once you managed to generate your website in "_site", you need to test using it. To do this, use the following command :
+      </p>
+
+
+
+      <pre class="src src-text">
+	$ jekyll --server
+      </pre>
+
+
+      <p>
+	This will start a local HTTP server on port 4000, that will display your website. This is a great way to test that everything is okay before building the final HTML pages.
+      </p>
+    </div>
+  </div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+  <h2 id="sec-3"><span class="section-number-2">3</span> Deploy to a server</h2>
+  <div id="outline-container-3-1" class="outline-3">
+    <h3 id="sec-3-1"><span class="section-number-3">3.1</span> Git repositories</h3>
+    <div class="outline-text-3" id="text-3-1">
+      <p> 
+	In order to deploy this website to a server, we will use a code versionning tool : Git.
+      </p>
+      <p>
+	First of all, convert your staticsite (the working directory) directory to a git repository :
+      </p>
+
+
+
+      <pre class="src src-text">
+	# Inside of staticsite/
+
+	$ git init
+	$ git add *
+
+	# Commit with message "Initial commit", for example
+
+	$ git commit -a -m "Initial commit"
+      </pre>
+
+
+      <p>
+	Next, connect to your server using SSH. We are going to create a "bare" repository, that will be used as a remote for the local git repository. This "bare" repository will then be used as origin for the clone that is read by the web server. Maybe this is a bit complicated, but don't worry, we'll come down to it.
+      </p>
+
+
+
+      <pre class="src src-text">
+	# On the server
+	$ git init --bare staticsite
+	Initialized empty git repository in staticsite/
+      </pre>
+
+
+      <p>
+	Now, get back on the local machine, inside of the Git repository, and run :
+      </p>
+
+
+
+      <pre class="src src-text">
+	$ git remote add origin user@server:path/to/staticsite
+	$ git push origin master
+      </pre>
+
+
+      <p>
+	Where user@server are the SSH login information to the server, and path/to/staticsite, the path to the staticsite directory on the server, relative to user's home.
+      </p>
+      <p>
+	We have now pushed our website to the "bare" repository. We are going to create a local clone of the repository, on the server.
+      </p>
+
+
+
+      <pre class="src src-text">
+	# On the server
+	$ git clone staticsite
+      </pre>
+
+
+      <p>
+	You should then make Jekyll generate the website inside of this directory (staticsite). Just 'cd' into it and run the command 'jekyll', and the site will be generated to '_site'.
+      </p>
+
+    </div>
+
+    <div id="outline-container-3-1-1" class="outline-4">
+      <h4 id="sec-3-1-1"><span class="section-number-4">3.1.1</span> Ignore the "_site" directory</h4>
+      <div class="outline-text-4" id="text-3-1-1">
+
+
+	<p>
+	  A nice trick is to create the .gitignore file, in the staticsite directory, and to add "_site" to it. This would force Git to ignore the _site directory. This is useful because there is no need to transmit that directory from a computer to another.
+      </p></div>
+    </div>
+
+  </div>
+
+  <div id="outline-container-3-2" class="outline-3">
+    <h3 id="sec-3-2"><span class="section-number-3">3.2</span> Git hooks</h3>
+    <div class="outline-text-3" id="text-3-2">
+
+
+      <p>
+	To automate the website generation process, we are going to use git hooks. We have two things to automate :
+      </p><dl>
+	<dt>Automatic server repository clone pull from "bare" repository</dt><dd>As we saw, we have two instances of the repository on the server ; one "bare", the central server that receives pushes, and a clone of this bare repository. We need to automate the update of this clone when the bare repository is updated.
+	</dd>
+	<dt>Automatic website building</dt><dd>Once the clone is updated, we need to run Jekyll to generate the website.
+	</dd>
+      </dl>
+
+
+      <p>
+	In order to automate these two things, we will use the same mechanism : the Git hook called "post-update". It runs just after receiving a push from a remote. Here is an example of this script :
+      </p>
+
+
+
+      <pre class="src src-text">
+	git --git-dir=/home/pistache/staticsite/.git/ pull origin master
+	jekyll /home/pistache/staticsite/ /home/pistache/staticsite/_site/
+      </pre>
+
+
+      <p>
+	Here we go ! The first line will run the pull, then Jekyll will build the website.
+      </p>
+      <p>
+	If you use this configuration in combination with SSH public-keys, it is really efficient. As soon as I commit and push a file in emacs, the whole website gets rebuilded and I can see the update in one or two secondes, maximum.
+    </p></div>
+  </div>
+</div>
+
+<div id="postamble">
+  <p class="date">Date: 2013-10-15T02:56+0200</p>
+  <p class="author">Author: Hugo Geoffroy</p>
+  <p class="creator"><a href="http://orgmode.org">Org</a> version 7.9.3f with <a href="http://www.gnu.org/software/emacs/">Emacs</a> version 24</p>
+</div>
+
