@@ -5,7 +5,14 @@
 .navbar-brand:hover #logo {
     opacity: 1
 }
-#home-header p {
+#home-header {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+#home-header h1 {
+    margin-top: 0px;
+}
+#home-header h1 + p {
     font-size: 14px;
 }
 #home-header p:first-child {
