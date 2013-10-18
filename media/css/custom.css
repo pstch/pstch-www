@@ -9,11 +9,11 @@
     padding-top: 15px;
     padding-bottom: 15px;
 }
-#home-header-content {
-    float: right;
-}
-#home-header-pineapple {
+#home-header > .container > img {
     float: left;
+}
+#home-header > .container > p {
+    margin-left: 100px;
 }
 #home-header h1 {
     margin-top: 0px;
