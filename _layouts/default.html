@@ -1,12 +1,14 @@
 {% include header.html %}
 {% include menu.html %}
 
-{% if page.title %}
-<div class="page-header">
-  <h1>{{ page.title }} {% if page.subtitle %}<small>{{ page.subtitle }}</small>{% endif %}</h1>
+<div class="container">
+  {% if page.title %}
+  <div class="page-header">
+    <h1>{{ page.title }} {% if page.subtitle %}<small>{{ page.subtitle }}</small>{% endif %}</h1>
+  </div>
+  {% endif %}
+  
+  {{ content }}
 </div>
-{% endif %}
-
-{{ content }}
 
 {% include footer.html %}
