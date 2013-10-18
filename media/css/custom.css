@@ -8,7 +8,7 @@
 #home-header {
     padding-top: 15px;
     padding-bottom: 15px;
-    margin-bottom: 10px;
+    margin-bottom: 25px;
 }
 #home-header > .container > img {
     float: left;
@@ -30,5 +30,5 @@
     text-align: center;
 }
 #home-cells > .row > div h2 {
-    margin-top: 0px;
+    margin-top: 5px;
 }
