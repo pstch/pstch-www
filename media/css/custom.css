@@ -9,6 +9,12 @@
     padding-top: 15px;
     padding-bottom: 15px;
 }
+#home-header-content {
+    float: right;
+}
+#home-header-pineapple {
+    float: left;
+}
 #home-header h1 {
     margin-top: 0px;
 }
