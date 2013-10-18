@@ -14,22 +14,19 @@
   <!-- Collect the nav links, forms, and other content for toggling -->
   <div class="collapse navbar-collapse navbar-ex1-collapse">
     <ul class="nav navbar-nav">
-    {% for link in site.navigation %}
+     {% for link in site.navigation %}
       {% assign current = nil %}
       {% if page.url == link.url or page.layout == link.layout %}
-        {% assign current = 'current' %}
+       {% assign current = 'active' %}
       {% endif %}
 
-      <li class="{% if forloop.first %}first{% endif %} {{ current }} {% if forloop.last %}last{% endif %}">
-        <a class="{{ current }}" href="{{ link.url }}">{{ link.text }}</a>
+      <li class="{{ current }}">
+        <a href="{{ link.url }}">
+	  {% if link.icon %}<i class="icon icon-{{ link.icon }}"></i> {% endif %}
+	  {{ link.text }}
+	</a>
       </li>
-    {% endfor %}
-
-
-      <li class="active"><a href="/"><i class="glyphicon glyphicon-home"></i> Homepage</a></li>
-      <li><a href="/services.html"><i class="glyphicon glyphicon-wrench"></i> Services</a></li>
-      <li><a href="/code.html"><i class="glyphicon glyphicon-cog"></i> Code</a></li>
-      <li><a href="/posts.html"><i class="glyphicon glyphicon-align-left"></i> Posts</a></li>
+     {% endfor %}
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li><a href="http://munin.pstch.net/"><i class="glyphicon glyphicon-globe"></i> Network status (Munin)</a></li>
