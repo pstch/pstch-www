@@ -8,6 +8,7 @@
 #home-header {
     padding-top: 15px;
     padding-bottom: 15px;
+    margin-bottom: 0px;
 }
 #home-header > .container > img {
     float: left;
@@ -19,7 +20,7 @@
     margin-top: 0px;
 }
 #home-header img + p {
-    font-size: 24px;
+    font-size: 20px;
     line-height: 1.3;
 }
 #home-header p {
