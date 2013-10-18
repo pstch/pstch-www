@@ -29,6 +29,6 @@
 #home-cells > .row > div {
     text-align: center;
 }
-#home-cells > .row > div > h2 {
+#home-cells > .row > div h2 {
     margin-top: 0px;
 }
