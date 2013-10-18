@@ -5,3 +5,9 @@
 .navbar-brand:hover #logo {
     opacity: 1
 }
+#home-header p {
+    font-size: 14px;
+}
+#home-header p:first-child {
+    font-size: 18px;
+}
