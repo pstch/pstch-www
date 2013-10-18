@@ -1,0 +1,18 @@
+navigation:
+- text: Homepage
+  layout: index
+  icon: home
+  url: /
+- text: Services
+  icon: wrench
+  layout: services
+  url: /services.html
+- text: Code
+  icon: cog
+  layout: code
+  url: /code.html
+- text: Posts
+  icon: align-left
+  layout: posts
+  url: /posts.html
+  
