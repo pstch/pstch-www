@@ -26,6 +26,6 @@
 #home-header p {
     font-size: 14px;
 }
-#home-cells {
+#home-cells > .row > div {
     text-align: center;
 }
