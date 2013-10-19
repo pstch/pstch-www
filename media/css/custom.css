@@ -51,6 +51,7 @@
 }
 #post-list > li > small {
     float: right;
+    margin-right: 15px;
 }
 #post-list > li {
     border-bottom: 1px dotted #ddd;
