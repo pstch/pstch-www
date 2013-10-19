@@ -6,7 +6,7 @@ title: Posts
   {% for post in site.posts %}
     <li>
       <a href="{{ post.url }}">{{ post.title }}</a><br/>
-      <small>{{ page.date | date: "%-d %B %Y" }}</small>
+      <small>{{ page.date | date_to_long_string }}</small>
     </li>
   {% endfor %}
 </ul>
