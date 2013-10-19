@@ -1,0 +1,176 @@
+---
+layout: default
+lang: Français
+title: Configurer Postfix en tant que serveur de mails secondaire
+---
+# Pré-requis
+
+Les lecteurs de cet article sont supposés avoir des bases dans la configuration d'un serveur SMTP (ici, Postfix), et sur l'écriture d'une zone DNS.
+
+# Introduction
+
+De la même manière qu'avec le courrier classique, un mail ne doit pas être perdu. Quand un facteur veut déposer du courrier dans une boîte aux lettres, et qu'il ne peut pas le faire (portail fermé, boîte aux lettres pleine, ou pour d'autres raisons), dans la plupart des cas il essaiera une autre fois puis renverra le courrier à l'expéditeur, si l'adresse y est indiquée.
+
+Un serveur SMTP fonctionne globalement de la même manière. Si un mail ne peut pas être livré, le serveur d'origine du mail retentera plusieurs fois, et abandonnera au bout d'un certain nombre d'essais, ou d'un certain temps, selon les configurations.
+
+Pour être sur que tous les mails reçus sur un domaine soient acceptés, il est nécessaire de mettre en place un ou plusieurs serveurs SMTP secondaires. La première étape pour cela est d'indiquer, à ceux qui veulent envoyer du mail sur un domaine, qu'il existe plusieurs serveurs SMTP sur lesquels envoyer des mails. Ensuite, nous verrons comment indiquer à un serveur SMTP qu'il fait office de serveur secondaire pour un domaine, et qu'il doit donc transférer les mails dès que possible au serveur SMTP primaire.
+
+# Indiquer la présence d'un serveur secondaire (Zone DNS)
+
+Pour indiquer la présence d'un serveur de mails sur un nom de domaine (et donc, pour pouvoir recevoir des mails sur ce nom de domaine), on utilise l'enregistrement DNS `MX` (pour Mail eXchanger). Cet enregistrement indique le(s) nom(s) de domaine sur lesquels envoyer les mails. Voici par exemple, les enregistrements MX correspondant à mon domaine `pstch.net` :
+
+    pstch.net.    86400    IN  MX  16 mx0.pstch.net.
+    pstch.net.    86400    IN  MX  32 mx1.pstch.net.
+
+Comme vous le voyez, il existe deux serveurs de mails disponibles pour ce nom de domaine. La valeur d'un champ `MX` est composé de deux parties :
+
+-   L'ordre de préférence
+-   Le nom d'hôte
+
+Le serveur primaire est celui qui a l'ordre de préférence le plus bas (ici, `mx0.pstch.net`). La priorité est donc inverse à l'ordre de préférence. On peut avoir plusieurs serveurs qui partagent le même ordre de préférence, pour faire de la répartition de charges, mais ce sujet n'est pas couvert par cet article. Le nom d'hôte peut être externe (appartenir à un autre domaine), mais doit toujours pouvoir être traduit en une adresse IP. La convention est de nommer mes serveurs de mails `mx`, suivi d'un indice indiquant sa priorité (`mx0`, ou `mx`, utilisé pour le serveur primaire, les nombres plus hauts pour les serveurs auxiliaires).
+
+Vous l'aurez compris, pour indiquer la présence d'un serveur SMTP secondaire, si vous n'en utilisez qu'un actuellement, il vous faudra rajouter un enregistrement MX, avec un ordre de préférence plus grand, et avec le nom d'hôte du serveur SMTP que vous souhaitez configurer comme secondaire. Voici un exemple provenant de ma zone DNS (pour le nom de domaine `pstch.net`), avec les deux enregistrements `MX` et les enregistrements `A` (permettant de résoudre un nom d'hôte en une adresse IPv4) correspondants :
+
+                    IN      MX      16 mx0.pstch.net.
+                    IN      MX      32 mx1.pstch.net.
+    
+    mx0             IN      A       91.203.212.181
+    mx1             IN      A       151.236.21.168
+
+(N'oubliez pas de mettre à jour le numéro de série de la zone DNS, et de le recharger, avec `rndc reload` (Bind), par exemple.)
+
+Maintenant, les serveurs SMTP qui enverront du mail au domaine `pstch.net` essaieront d'abord sur `mx0.pstch.net`, puis si ce dernier est indisponible, sur `mx1.pstch.net`, qui gardera alors le mail pour `mx0.pstch.net`, et reessaiera plusieurs fois de le lui livrer.
+
+## Pourquoi ?
+
+****Nous avons dit en première partie que, de toute façon, un serveur SMTP essaie plusieurs fois de livrer du courrier à un domaine. Dans ce cas là, pourquoi mettre en place un serveur secondaire ?****
+
+Car cela nous permet de changer la configuration du serveur SMTP secondaire, pour qu'il garde les mails plus longtemps qu'un serveur extérieur au domaine ne l'aurait fait. Cela permet aussi de garder la trace des mails qui sont "en file d'attente" (c'est à dire, qui n'ont pas encore été livrés au serveur de destination).
+
+# Configurer Postfix pour qu'il relaie les mails vers le serveur primaire
+
+Configurer postfix pour lui indiquer d'être un serveur secondaire est assez trivial, car il suffit de lui indiquer le nom de domaine pour lequel il relaie le mail. Postfix se chargera lui-même d'essayer de transmettre le mail vers le serveur primaire, puis de le mettre en file d'attente (`deferred`) si le serveur primaire n'est pas disponible. La variable à utiliser pour cela est `relay_domains`. Il suffit d'indiquer, dans le fichier de configuration de postfix utilisé (`main.cf`, par exemple), le nom de domaine pour lequel le serveur est secondaire :
+
+    relay_domains = $mydestination pstch.net
+
+Il peut aussi être nécessaire d'utiliser la variable `relay_recipient_maps`, pour limiter les adresses pour lesquelles Postfix va relayer les mails. Cela peut être utile pour lutter contre le spam (messages indésirables) directement au niveau du serveur SMTP.
+
+N'oubliez pas de recharger votre configuration postfix, avec la commande `postfix reload` (ou en redémarrant le serveur Postfix).
+
+# Test
+
+Soit un domaine `example.com`, dont les enregistrements `MX` pointent vers les domaines `primaire.example.com` et `secondaire.example.com`. Nous allons tester le comportement des serveurs SMTP de ce domaine quand `primaire.example.com` devient indisponible.
+
+## Cache DNS
+
+Une fois que tout cela est en place, il y a une première étape à ne pas oublier : vider les caches DNS des serveurs. En effet, si un serveur a encore en mémoire les informations oboslètes qui étaient utilisés avant le changement de la zone DNS, cela peut créer une confusion (serveur secondaire ne se reconnaissant pas comme secondaire, par exemple). Si vous utilisez des serveurs DNS BIND locaux, la commande à utiliser est :
+
+    root@primaire:~# rndc flush
+    root@secondaire:~# rndc flush
+
+## Simuler une panne du serveur primaire
+
+Pour simuler une panne du serveur SMTP primaire, nous allons simplement l'arrêter. Si le serveur primaire est un serveur postfix, on peut utiliser la commande :
+
+    root@primaire:~# postfix stop
+
+## Envoyer un mail au domaine
+
+Dans cette situation, si j'envoie un mail au domaine `example.com`, le serveur SMTP essaiera d'abord de s'adresser à `primaire.example.com`, puis comme celui-ci est indisponible, enverra le mail à `secondaire.example.com`.
+
+J'envoie donc un mail à partir d'une adresse GMail, au domaine `example.com`. Je vois alors apparaître dans les journaux du serveur SMTP sur `secondaire.example.com`, les lignes suivantes :
+
+    Oct 10 11:45:21 preeza postfix/smtpd[6041]: connect from mail-we0-f180.google.com[74.125.82.180] 
+    Oct 10 11:45:21 preeza postfix/smtpd[6041]: 2F322100A0A7: client=mail-we0-f180.google.com[74.125.82.180]
+    Oct 10 11:45:21 preeza postfix/cleanup[6047]: 2F322100A0A7: message-id=<CAMeDZSBecpb0OS3Pu75f_f7qOV2-vpq9L3tDo9qYik2gaFuB_Q@mail.gmail.com>
+    Oct 10 11:45:21 preeza postfix/qmgr[23261]: 2F322100A0A7: from=<hugo.geoffroy@gmail.com>, size=1691, nrcpt=1 (queue active)
+    Oct 10 11:45:21 preeza postfix/smtpd[6041]: disconnect from mail-we0-f180.google.com[74.125.82.180] 
+    Oct 10 11:45:21 preeza postfix/smtp[6048]: connect to primaire.example.com[XX.XX.XX.XX]:25] Connection refused 
+    Oct 10 11:45:21 preeza postfix/smtp[6048]: 2F322100A0A7: to=<test@example.com>, relay=none, delay=0.22, delays=0.2/0.01/0.02/0, dsn=4.4.1, status=deferred (connect to primaire.example.com[XX.XX.XX.XX]:25: Connection refused)
+
+On voit que le serveur reçoit un mail des serveurs SMTP de Google, qui se sont donc bien adressés au serveur secondaire en voyant que le primaire n'était pas disponible. Après avoir réceptionné le mail, et s'être déconnecté des serveurs de Google, le serveur secondaire essaie de se connecter au serveur primaire pour lui livrer le mail. Cependant, la connexion est refusée, car le serveur primaire n'est pas disponible. Postfix marque alors le mail comme `deferred` (différé), et essaiera de le livrer plus tard. Ces 2 dernières lignes peuvent se répéter plusieurs fois dans le temps, à chaque fois qu'un nouvelle tentative de livraison aura lieu.
+
+### Gérer la file d'attente
+
+Si on utilise la commande `postqueue`, on peut avoir des informations, et gérer, la file d'attente de Postfix. Par exemple la commande `postqueue -p` permet d'afficher la liste des mails en file d'attente, et la raison pour laquelle ils sont en liste d'attente : 
+
+    root@secondaire:~# postqueue -p
+    -Queue ID- --Size-- ----Arrival Time---- -Sender/Recipient-------
+    2F322100A0A7     1691 Thu Oct 10 13:19:23  hugo.geoffroy@gmail.com
+                 (connect to primaire.example.com[XX.XX.XX.XX]:25: Connection refused)
+                                             test@example.com
+    
+    -- 3 Kbytes in 1 Request.
+
+La commande `postqueue -f`, elle, permet de "flusher" la file d'attente, ce qui équivaut à dire à Postfix de retenter de livrer tous les mails en file d'attente :
+
+    root@secondaire:~# postqueue -f
+
+Si nous exécutons cette commande pendant que le serveur primaire est toujours indisponible, nous pouvons voir dans les journaux du serveur SMTP secondaire une nouvelle tentative, toujours infructueuse.
+
+## Fin de la panne
+
+Nous considérons que le panne du serveur SMTP primaire a été réparée, et nous allons donc le redémarrer. Si le serveur primaire est un serveur postfix, on peut utiliser la commande :
+
+    root@primaire:~# postfix start
+
+## Livraison du mail au serveur primaire
+
+Quelques minutes après avoir redémarré le serveur primaire (pour éviter d'attendre, vous pouvez toujours exécuter la commande `postqueue -f` sur le serveur secondaire, pour vider la file d'attente) nous pouvons voir apparaître sur les journaux du serveur SMTP :
+
+    Oct 10 11:53:13 preeza postfix/qmgr[23261]: 2F322100A0A7: from=<hugo.geoffroy@gmail.com>, size=1691, nrcpt=1 (queue active)
+    Oct 10 11:53:14 preeza postfix/smtp[6842]: 2F322100A0A7: to=<test@example.com>, relay=primaire.example.com[XX.XX.XX.XX]:25], delay=473, delays=473/0.02/0.22/0.05, dsn=2.0.0, status=sent (250 2.0.0 Ok: queued as D8F8A1D41C7)
+
+On peut voir ici que le mail a finalement été livré au serveur primaire, au bout de 473 secondes (7 minutes et 53 secondes). Notre domaine peut donc maintenant recevoir les mails même si le serveur primaire est indisponible !
+
+# Configuration supplémentaire
+
+On a configuré un serveur de mail secondaire, mais nous ne connaissons pas encore ses paramètres et son comportement exact : combien de temps le mail sera gardé ? à quelle fréquence le serveur tente de livrer le mail à nouveau ?
+
+Pour configurer ce comportement, Postfix met à notre disposition les variables suivantes :
+
+-   `queue_run_delay` (par défaut: 300 secondes)
+
+Fréquence entre chaque traitement de la file d'attente (ici la file d'attente sera traitée toutes les 300 secondes)
+
+-   `minimal_backoff_time` (par défaut: 300 secondes)
+
+Le temps minimal pendant lequel un message ne sera pas traité à nouveau. Doit être supérieur ou égal à `queue_run_delay`.
+
+-   `maximal_backoff_time` (par défaut: 4000 secondes)
+
+Le temps maximal pendant lequel un message ne sera pas traité à nouveau. Doit être supérieur ou égal à `minimal_backoff_time`.
+
+-   `maximal_queue_lifetime` (par défaut: 5 jours)
+
+Combien de temps garder un message avant de le renvoyer à l'expéditeur comme "non livrable"
+
+Toutes ces valeurs doivent être spécifiées comme un nombre, suivi de l'unité :
+
+-   's' pour secondes
+
+-   'm' pour minutes
+
+-   'h' pour heures
+
+-   'd' pour jours
+
+-   'w' pour semaines
+
+Postfix renvoie les messages fréquemment (`minimal_backoff_time`) quand ils sont arrivés, et au fur et à mesure de l'attente, le temps entre chaque envoi augmente, jusqu'à un maximum (`maximal_backoff_time`).
+
+# Conclusion
+
+Postfix est assez simple à configurer, nous l'avons vu en constatant que la mise en place d'un serveur SMTP secondaire n'est qu'une affaire de quelques minutes.
+
+Notez que la mise en place d'un serveur SMTP secondaire peut être plus compliquée quand on utilise des systèmes anti-spam au niveau SMTP. Ne laissez pas votre serveur SMTP secondaire être un contournement de votre système antispam.
+
+N'hésitez pas à critiquer, poser des questions ou chercher de l'aide en commentaires.
+
+## Références :
+
+-   **<http://www.postfix.org/STANDARD_CONFIGURATION_README.html#backup>:** Tutoriel officiel pour la mise en place d'un serveur de mail secondaire
+
+-   **<http://www.postfix.org/TUNING_README.html#hammer>:** Personnalisation des paramètres Postfix, ici pour la livraison du mail au serveur primaire
+
+-   **<http://www.postfix.org/postconf.5.html>:** Référence des paramètres de configuration Postfix
