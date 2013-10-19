@@ -1,11 +1,11 @@
----
+1;3408;0c---
 layout: default
 title: Posts
 ---
 <ul>
   {% for post in site.posts %}
     <li>
-      <a href="{{ post.url }}">{{ post.title }}</a>&nbsp;<small class="label label">{{ post.date | date_to_long_string }}</small>
+      <a href="{{ post.url }}">{{ post.title }}</a>&nbsp;<small class="label label-default">{{ post.date | date_to_long_string }}</small>
     </li>
   {% endfor %}
 </ul>
