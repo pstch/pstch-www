@@ -49,6 +49,7 @@
 #post-list > li {
     margin-top: 5px;
     border-bottom: 1px dotted #ddd;
+    padding-bottom: 4px;
 }
 #post-list > li:hover {
     border-bottom: 1px dotted #999;
