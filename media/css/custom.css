@@ -50,7 +50,7 @@
     text-decoration: none;
 }
 #post-list > li > small {
-    float: left;
+    float: right;
 }
 #post-list > li {
     border-bottom: 1px dotted #ddd;
