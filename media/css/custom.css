@@ -44,14 +44,17 @@
 }
 
 #post-list {
-disc-style-type: none;
+    disc-style-type: none;
 }
 #post-list > li > a:hover {
-text-decoration: none;
+    text-decoration: none;
+}
+#post-list > li > small {
+    float: left;
 }
 #post-list > li {
-border-bottom: 1px dotted #ddd;
+    border-bottom: 1px dotted #ddd;
 }
 #post-list > li:hover {
-border-bottom: 1px dotted #bbb;
+    border-bottom: 1px dotted #bbb;
 }
