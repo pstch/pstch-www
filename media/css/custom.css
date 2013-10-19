@@ -44,7 +44,7 @@
 }
 
 #post-list {
-    disc-style-type: none;
+    list-style-type: none;
 }
 #post-list > li > a:hover {
     text-decoration: none;
